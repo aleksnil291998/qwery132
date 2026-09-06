@@ -1,1 +1,146 @@
 @import "tailwindcss";
+
+/* ============================================================
+   Учёт FPV-дронов — тема оформления «штаб»
+   Тёмная оливковая палитра, сигнальный янтарный акцент,
+   шрифты: Russo One (заголовки) + IBM Plex Sans/Mono (текст)
+   ============================================================ */
+
+@theme {
+  --font-display: "Russo One", "IBM Plex Sans", sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Палитра */
+  --color-bark: #0e110a;        /* фон страницы */
+  --color-moss: #141810;        /* фон шапки/панелей */
+  --color-panel: #191f12;       /* карточки */
+  --color-panel2: #212917;      /* поля ввода */
+  --color-raise: #2a3320;       /* hover */
+  --color-line: #323d25;        /* границы */
+  --color-line2: #4a5838;       /* границы hover */
+  --color-khaki: #e9e7d4;       /* основной текст */
+  --color-dim: #9aa287;         /* приглушённый текст */
+  --color-faint: #67714f;       /* подписи */
+  --color-amber: #f0b429;       /* сигнальный акцент */
+  --color-ready: #8fbf6a;       /* зелёный — исправен */
+  --color-alert: #e06a4a;       /* красный — не исправен */
+  --color-alertdeep: #c14a2e;   /* тёмно-красный — боевое применение */
+  --color-nsu: #ecc94b;         /* жёлтый — НС частот */
+  --color-orang: #ee8f4a;       /* оранжевый — не в наличии */
+  --color-bluish: #8ab0dc;      /* синий — у кого находятся */
+
+  /* Анимации состояний */
+  --animate-rise: rise 0.45s cubic-bezier(0.22, 0.75, 0.3, 1) both;
+  --animate-fadein: fadein 0.3s ease both;
+  --animate-radar: radar 4.6s linear infinite;
+  --animate-blip: blip 3s ease-in-out infinite;
+  --animate-toastin: toastin 0.32s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  --animate-blinker: blinker 1.6s steps(2, start) infinite;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes radar {
+  to { transform: rotate(360deg); }
+}
+@keyframes blip {
+  0%, 100% { opacity: 0.15; transform: scale(0.75); }
+  50%      { opacity: 1;    transform: scale(1.2); }
+}
+@keyframes toastin {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes blinker {
+  50% { opacity: 0.25; }
+}
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-khaki);
+  background-color: var(--color-bark);
+}
+
+/* Многослойный фон: свечения + штабная сетка + шум */
+.bg-ops {
+  background-color: var(--color-bark);
+  background-image:
+    radial-gradient(1100px 480px at 88% -8%, rgba(240, 180, 41, 0.075), transparent 62%),
+    radial-gradient(900px 620px at -12% 108%, rgba(143, 191, 106, 0.065), transparent 58%),
+    radial-gradient(1400px 900px at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.32)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    linear-gradient(rgba(233, 231, 212, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(233, 231, 212, 0.028) 1px, transparent 1px);
+  background-size: auto, auto, auto, 140px 140px, 34px 34px, 34px 34px;
+  background-attachment: fixed;
+}
+
+/* Полосы прокрутки */
+* { scrollbar-width: thin; scrollbar-color: var(--color-line2) transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: var(--color-line2); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Базовые компоненты интерфейса */
+.btn {
+  @apply inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-md border border-line bg-panel2 px-3 py-2 text-sm font-medium text-khaki transition-all duration-150 hover:border-line2 hover:bg-raise active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40;
+}
+.btn-amber {
+  @apply border-amber/70 bg-amber font-semibold text-[#1d1503] shadow-[0_0_26px_rgba(240,180,41,0.22)] hover:border-amber hover:bg-[#f8c44d];
+}
+.btn-ghost {
+  @apply border-transparent bg-transparent text-dim hover:border-line hover:bg-panel2 hover:text-khaki;
+}
+.btn-danger {
+  @apply border-alert/50 bg-alert/10 text-alert hover:bg-alert/20;
+}
+.field {
+  @apply w-full rounded-md border border-line bg-panel2 px-3 py-2 text-sm text-khaki outline-none transition placeholder:text-faint focus:border-amber focus:ring-2 focus:ring-amber/25;
+}
+.lbl {
+  @apply mb-1.5 block text-[11px] font-semibold tracking-[0.12em] text-dim uppercase;
+}
+.panel {
+  @apply rounded-lg border border-line bg-panel;
+}
+
+/* Бумажный бланк отчёта */
+.paper {
+  background: #fbfaf0;
+  color: #23261a;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+  font-family: var(--font-sans);
+}
+.paper-table { border-collapse: collapse; }
+.paper-table th, .paper-table td {
+  border: 1px solid #98a084;
+  padding: 4px 7px;
+  vertical-align: middle;
+}
+.paper-num { font-family: var(--font-mono); text-align: center; font-weight: 600; }
+
+/* Печать: показываем только бланк отчёта (ориентация — альбомная) */
+#print-area { display: none; }
+@media print {
+  @page { size: A4 landscape; margin: 9mm; }
+  html, body { background: #fff !important; }
+  #root .app-shell { display: none !important; }
+  .toast-root { display: none !important; }
+  #print-area { display: block !important; }
+  #print-area .paper {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
